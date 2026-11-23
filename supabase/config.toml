@@ -1,0 +1,29 @@
+# Configuração do Supabase CLI para desenvolvimento local.
+# supabase start        sobe Postgres + PostGIS, Auth e API em Docker
+# supabase db reset     recria o banco com as migrações e o seed.sql
+# supabase test db      roda os testes pgTAP de supabase/tests/database
+project_id = "campocerto"
+
+[api]
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+
+[db]
+port = 54322
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+port = 54323
+
+[auth]
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/auth/confirmar"]
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
