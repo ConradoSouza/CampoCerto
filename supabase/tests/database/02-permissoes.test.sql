@@ -1,6 +1,6 @@
 -- Permissões por linha: cada pessoa vê e edita só o que o perfil e o escopo permitem.
 begin;
-select plan(20);
+select plan(23);
 
 -- Pessoas (o gatilho de auth.users cria a linha em usuario)
 insert into auth.users (id, email, raw_user_meta_data) values
@@ -43,12 +43,15 @@ select is((select count(*)::int from talhao), 2, 'admin do G1 vê os talhões do
 select is((select count(*)::int from usuario), 2, 'admin vê as pessoas do seu grupo');
 select ok((select count(*) > 0 from auditoria), 'admin lê a auditoria do grupo');
 select lives_ok($$update safra set status = 'aberta' where id = '20000000-0000-7000-8000-0000000000c1'$$, 'admin reabre safra encerrada (CM7)');
+select lives_ok($$select conceder_permissao('NOVO@x.dev', 'operador', 'fazenda', '20000000-0000-7000-8000-0000000000f1')$$, 'admin concede perfil pelo e-mail');
+select throws_ok($$select conceder_permissao('ninguem@x.dev', 'operador', 'fazenda', '20000000-0000-7000-8000-0000000000f1')$$, 'P0002', null, 'e-mail sem login é recusado');
 update safra set status = 'encerrada' where id = '20000000-0000-7000-8000-0000000000c1';
 
 -- Administrador do G2 não enxerga o G1
 set local request.jwt.claim.sub = '20000000-0000-7000-8000-00000000000b';
 select results_eq($$select nome from fazenda$$, array['F3'], 'admin do G2 vê só o G2');
 select is((select count(*)::int from empresa where grupo_id = '20000000-0000-7000-8000-000000000001'), 0, 'empresas de outro grupo ficam ocultas');
+select throws_ok($$select conceder_permissao('novo@x.dev', 'operador', 'fazenda', '20000000-0000-7000-8000-0000000000f1')$$, '42501', null, 'admin de outro grupo não concede acesso');
 
 -- Gerente na F1 e leitura na F2 (exemplo da especificação)
 set local request.jwt.claim.sub = '20000000-0000-7000-8000-00000000000c';

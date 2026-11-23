@@ -336,3 +336,42 @@ begin
 end;
 $$;
 revoke execute on function public.copiar_ocupacao(uuid, uuid, uuid) from anon;
+
+-- Concede um perfil a uma pessoa pelo e-mail. A pessoa precisa ter login
+-- (se não tiver, a web convida antes pelo Auth e chama de novo).
+create or replace function public.conceder_permissao(email text, perfil public.perfil, escopo public.escopo, escopo_id uuid)
+returns uuid
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  pessoa uuid;
+  grupo uuid;
+  nova uuid;
+begin
+  grupo := case escopo
+    when 'grupo' then (select g.id from public.grupo g where g.id = conceder_permissao.escopo_id)
+    when 'empresa' then (select e.grupo_id from public.empresa e where e.id = conceder_permissao.escopo_id)
+    when 'fazenda' then (select f.grupo_id from public.fazenda f where f.id = conceder_permissao.escopo_id)
+  end;
+  if grupo is null or not app.tem_perfil_no_grupo(grupo, array['administrador']::public.perfil[]) then
+    raise exception 'Só o administrador do grupo concede acesso' using errcode = 'insufficient_privilege';
+  end if;
+  select u.id into pessoa from public.usuario u where lower(u.email) = lower(trim(conceder_permissao.email));
+  if pessoa is null then
+    raise exception 'Nenhuma pessoa com login usa o e-mail %', conceder_permissao.email using errcode = 'no_data_found';
+  end if;
+  select p.id into nova from public.permissao p
+  where p.usuario_id = pessoa and p.perfil = conceder_permissao.perfil and p.escopo = conceder_permissao.escopo
+    and p.escopo_id = conceder_permissao.escopo_id and p.excluido_em is null;
+  if nova is not null then
+    return nova;
+  end if;
+  insert into public.permissao (usuario_id, perfil, escopo, escopo_id)
+  values (pessoa, conceder_permissao.perfil, conceder_permissao.escopo, conceder_permissao.escopo_id)
+  returning id into nova;
+  return nova;
+end;
+$$;
+revoke execute on function public.conceder_permissao(text, public.perfil, public.escopo, uuid) from anon;

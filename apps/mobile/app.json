@@ -1,0 +1,21 @@
+{
+  "expo": {
+    "name": "Campo Certo",
+    "slug": "campocerto",
+    "scheme": "campocerto",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "platforms": ["android", "ios"],
+    "android": {
+      "package": "br.com.campocerto.app",
+      "softwareKeyboardLayoutMode": "pan"
+    },
+    "ios": {
+      "bundleIdentifier": "br.com.campocerto.app",
+      "supportsTablet": false
+    },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": true }
+  }
+}
