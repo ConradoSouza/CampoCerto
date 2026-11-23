@@ -11,7 +11,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test": "turbo run test",
-    "db:test": "bash supabase/tests/rodar-local.sh"
+    "db:test": "bash supabase/local/rodar-testes.sh"
   },
   "devDependencies": {
     "turbo": "^2.11.0",

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Roda as migrações e os testes pgTAP num Postgres local com PostGIS e pgTAP,
 # sem Docker. Útil quando o Supabase CLI não está disponível.
-#   PGHOST=localhost PGUSER=postgres PGPASSWORD=postgres bash supabase/tests/rodar-local.sh
+#   PGHOST=localhost PGUSER=postgres PGPASSWORD=postgres bash supabase/local/rodar-testes.sh
 # Com Docker, prefira: supabase start && supabase test db
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -11,7 +11,7 @@ export PGHOST="${PGHOST:-localhost}" PGUSER="${PGUSER:-postgres}"
 
 dropdb --if-exists "$BANCO"
 createdb "$BANCO"
-sed "s/current_database_placeholder/$BANCO/" tests/simulacao-supabase.sql | psql -q -v ON_ERROR_STOP=1 -d "$BANCO" >/dev/null
+sed "s/current_database_placeholder/$BANCO/" local/simulacao-supabase.sql | psql -q -v ON_ERROR_STOP=1 -d "$BANCO" >/dev/null
 for m in migrations/*.sql; do
   psql -q -v ON_ERROR_STOP=1 -d "$BANCO" -f "$m" >/dev/null
 done

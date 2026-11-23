@@ -45,7 +45,7 @@ pnpm typecheck
 npx supabase test db # banco (pgTAP), com o Supabase local rodando
 ```
 
-Sem Docker, os testes do banco rodam num Postgres local com PostGIS e pgTAP: `pnpm db:test` (veja `supabase/tests/rodar-local.sh`).
+Sem Docker, os testes do banco rodam num Postgres local com PostGIS e pgTAP: `pnpm db:test` (veja `supabase/local/rodar-testes.sh`).
 
 ## Regras já aplicadas (entrega 1)
 

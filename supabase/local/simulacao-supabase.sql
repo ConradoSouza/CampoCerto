@@ -1,6 +1,6 @@
 -- Simula o mínimo do Supabase (papéis, schema auth, auth.uid) para rodar as
 -- migrações e os testes num Postgres comum com PostGIS e pgTAP.
--- Usado só por tests/rodar-local.sh; no Supabase de verdade isso já existe.
+-- Usado só por local/rodar-testes.sh (fora de tests/ para o supabase test db não rodá-lo); no Supabase de verdade isso já existe.
 do $$
 begin
   if not exists (select 1 from pg_roles where rolname = 'anon') then create role anon nologin; end if;

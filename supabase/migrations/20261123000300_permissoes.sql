@@ -280,7 +280,7 @@ begin
       update public.talhao set
         codigo = coalesce(item ->> 'codigo', codigo),
         nome = coalesce(item ->> 'nome', nome),
-        contorno = coalesce(st_setsrid(st_geomfromgeojson(item -> 'contorno'), 4326), contorno),
+        contorno = coalesce(st_multi(st_setsrid(st_geomfromgeojson(item -> 'contorno'), 4326)), contorno),
         area_produtiva_ha = case when item ? 'area_produtiva_ha' then (item ->> 'area_produtiva_ha')::numeric else area_produtiva_ha end,
         posse = coalesce((item ->> 'posse')::public.posse, posse)
       where id = (item ->> 'id')::uuid and fazenda_id = fazenda
@@ -292,7 +292,7 @@ begin
         fazenda,
         item ->> 'codigo',
         item ->> 'nome',
-        st_setsrid(st_geomfromgeojson(item -> 'contorno'), 4326),
+        st_multi(st_setsrid(st_geomfromgeojson(item -> 'contorno'), 4326)),
         0, -- recalculada pelo gatilho
         (item ->> 'area_produtiva_ha')::numeric,
         coalesce((item ->> 'posse')::public.posse, 'propria'),
